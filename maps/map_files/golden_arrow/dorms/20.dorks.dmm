@@ -7,8 +7,8 @@
 /turf/open/floor/almayer,
 /area/golden_arrow/dorms)
 "cD" = (
-/obj/structure/curtain/red,
 /obj/structure/window/framed/almayer,
+/obj/structure/curtain/red,
 /turf/open/floor/plating,
 /area/golden_arrow/dorms)
 "dc" = (
@@ -24,16 +24,16 @@
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 8
 	},
+/obj/structure/prop/invuln/lattice_prop{
+	icon_state = "lattice3";
+	pixel_x = 16;
+	pixel_y = -15
+	},
 /obj/structure/disposalpipe/segment{
 	dir = 4
 	},
 /obj/structure/cable/heavyduty{
 	icon_state = "4-8"
-	},
-/obj/structure/prop/invuln/lattice_prop{
-	icon_state = "lattice3";
-	pixel_x = 16;
-	pixel_y = -10
 	},
 /turf/open/floor/plating/plating_catwalk,
 /area/golden_arrow/dorms)
@@ -63,7 +63,7 @@
 /obj/structure/prop/invuln/lattice_prop{
 	icon_state = "lattice1";
 	pixel_x = 16;
-	pixel_y = -10
+	pixel_y = -15
 	},
 /turf/open/floor/almayer/edge,
 /area/golden_arrow/dorms)
@@ -153,7 +153,6 @@
 /area/golden_arrow/dorms)
 "hf" = (
 /obj/structure/surface/table/almayer,
-/obj/item/prop/magazine/book/bladerunner,
 /turf/open/floor/almayer/edge,
 /area/golden_arrow/dorms)
 "ho" = (
@@ -190,13 +189,13 @@
 /turf/open/floor/almayer/edge/southeast,
 /area/golden_arrow/dorms)
 "jy" = (
-/obj/item/trash/eat{
-	pixel_x = 10
-	},
 /obj/structure/prop/invuln/lattice_prop{
 	icon_state = "lattice1";
 	pixel_x = 16;
-	pixel_y = -10
+	pixel_y = -15
+	},
+/obj/item/trash/eat{
+	pixel_x = 10
 	},
 /turf/open/floor/almayer/edge,
 /area/golden_arrow/dorms)
@@ -355,7 +354,7 @@
 /obj/structure/prop/invuln/lattice_prop{
 	icon_state = "lattice3";
 	pixel_x = 16;
-	pixel_y = -10
+	pixel_y = -15
 	},
 /turf/open/floor/almayer,
 /area/golden_arrow/dorms)
@@ -492,10 +491,6 @@
 /obj/effect/decal/cleanable/dirt{
 	layer = 2.52
 	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "door_warning";
-	dir = 4
-	},
 /turf/open/floor/almayer/edge/east,
 /area/golden_arrow/dorms)
 "xm" = (
@@ -596,7 +591,6 @@
 /obj/item/trash/eat{
 	pixel_x = 10
 	},
-/obj/item/prop/magazine/dirty/torn/alt,
 /turf/open/floor/almayer,
 /area/golden_arrow/dorms)
 "DC" = (
@@ -679,7 +673,7 @@
 /obj/structure/prop/invuln/lattice_prop{
 	icon_state = "lattice3";
 	pixel_x = 16;
-	pixel_y = -10
+	pixel_y = -15
 	},
 /turf/open/floor/almayer/mono,
 /area/golden_arrow/dorms)
@@ -715,10 +709,6 @@
 /obj/item/clothing/suit/storage/jacket/marine/service{
 	pixel_x = 11
 	},
-/obj/item/prop/magazine/dirty/torn{
-	pixel_x = 2;
-	pixel_y = 6
-	},
 /turf/open/floor/almayer/edge,
 /area/golden_arrow/dorms)
 "OV" = (
@@ -737,12 +727,7 @@
 /turf/open/floor/almayer,
 /area/golden_arrow/dorms)
 "PA" = (
-/obj/structure/prop/invuln/lattice_prop{
-	icon_state = "lattice2";
-	pixel_x = 16;
-	pixel_y = -10
-	},
-/turf/closed/wall/almayer,
+/turf/closed/wall/almayer/outer,
 /area/golden_arrow/dorms)
 "QV" = (
 /obj/structure/bed/chair{
@@ -771,18 +756,28 @@
 /obj/structure/prop/invuln/lattice_prop{
 	icon_state = "lattice3";
 	pixel_x = 16;
-	pixel_y = -10
+	pixel_y = -15
 	},
 /obj/structure/prop/invuln/lattice_prop{
 	icon_state = "lattice2";
 	pixel_x = 16;
-	pixel_y = 22
+	pixel_y = 16
 	},
 /turf/open/floor/almayer/edge/north,
 /area/golden_arrow/dorms)
 "SL" = (
 /obj/structure/machinery/alarm/almayer{
 	dir = 1
+	},
+/obj/structure/prop/invuln/lattice_prop{
+	icon_state = "lattice3";
+	pixel_x = 16;
+	pixel_y = -15
+	},
+/obj/structure/prop/invuln/lattice_prop{
+	icon_state = "lattice2";
+	pixel_x = 16;
+	pixel_y = 16
 	},
 /obj/structure/pipes/vents/scrubber{
 	dir = 8
@@ -794,11 +789,6 @@
 	},
 /obj/structure/disposalpipe/trunk{
 	dir = 8
-	},
-/obj/structure/prop/invuln/lattice_prop{
-	icon_state = "lattice3";
-	pixel_x = 16;
-	pixel_y = -10
 	},
 /turf/open/floor/almayer/edge/north,
 /area/golden_arrow/dorms)
@@ -831,17 +821,13 @@
 /obj/structure/cable/heavyduty{
 	icon_state = "4-8"
 	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "door_warning";
-	dir = 4
-	},
 /turf/open/floor/almayer/edge/east,
 /area/golden_arrow/dorms)
 "XT" = (
 /obj/structure/prop/invuln/lattice_prop{
 	icon_state = "lattice3";
 	pixel_x = 16;
-	pixel_y = -10
+	pixel_y = -15
 	},
 /turf/open/floor/plating/plating_catwalk,
 /area/golden_arrow/dorms)
@@ -849,9 +835,6 @@
 /obj/structure/largecrate/random/secure,
 /obj/effect/decal/cleanable/dirt{
 	layer = 2.52
-	},
-/obj/item/prop/magazine/book/starshiptroopers{
-	pixel_y = 9
 	},
 /turf/open/floor/almayer/edge/southwest,
 /area/golden_arrow/dorms)
@@ -930,7 +913,7 @@ qe
 dg
 XT
 ds
-PA
+vF
 SL
 Nt
 jy
@@ -964,7 +947,7 @@ vr
 NK
 vF
 vF
-vF
 cD
 vF
+PA
 "}

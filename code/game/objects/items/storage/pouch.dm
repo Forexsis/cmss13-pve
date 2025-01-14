@@ -196,7 +196,7 @@
 
 /obj/item/storage/pouch/firstaid
 	name = "first-aid pouch"
-	desc = "A first aid pouch capable of storing a variety of basic medical supplies. It can hold ointments, bandages, injectors, and pill packets."
+	desc = "It contains, by default, autoinjectors. But it may also hold ointments, bandages, and pill packets."
 	icon_state = "firstaid"
 	storage_slots = 4
 	can_hold = list(

@@ -564,6 +564,3 @@ What a mess.*/
 /obj/structure/machinery/computer/secure_data/detective_computer
 	icon = 'icons/obj/structures/machinery/computer.dmi'
 	icon_state = "messyfiles"
-
-/obj/structure/machinery/computer/secure_data/noaccess
-	req_access = null

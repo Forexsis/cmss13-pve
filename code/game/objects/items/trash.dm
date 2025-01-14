@@ -184,8 +184,7 @@
 /obj/item/trash/USCMtray
 	name = "\improper USCM Tray"
 	desc = "Finished with its tour of duty."
-	icon = 'icons/obj/items/food_canteen.dmi'
-	icon_state = "tray"
+	icon_state = "MREtray"
 
 //////////
 ///Misc///

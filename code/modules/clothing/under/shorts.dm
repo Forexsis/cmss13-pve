@@ -8,11 +8,6 @@
 	name = "red athletic shorts"
 	icon_state = "redshorts"
 
-/obj/item/clothing/under/shorts/red/uscm
-	name = "USCM PT shorts"
-	desc = "Silky smooth Marine Corps PT shorts."
-	icon_state = "redshorts"
-
 /obj/item/clothing/under/shorts/green
 	name = "green athletic shorts"
 	icon_state = "greenshorts"
