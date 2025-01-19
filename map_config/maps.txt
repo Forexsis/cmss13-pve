@@ -73,6 +73,3 @@ endmap
 
 map whiskey_outpost_v2
 endmap
-
-map bosenmori_basho
-endmap
