@@ -29,16 +29,15 @@
 	var/list/obj/structure/dropship_equipment/equipments = list()
 
 	// dropship automated target
-	var/automated_hangar_id
-	var/automated_lz_id
+	var/automated_target
+	var/obj/docking_port/stationary/automated_hangar
+	var/obj/docking_port/stationary/automated_lz
 	var/automated_delay
 	var/automated_timer
+	var/flags_automated_airlock_presence = NO_FLAGS
+
 	var/datum/cas_signal/paradrop_signal
-
-	var/is_airlocked
-
-	//do you want turbulence?
-	var/turbulence = TRUE
+	var/turbulence = TRUE //do you want turbulence?
 
 /obj/docking_port/mobile/marine_dropship/Initialize(mapload)
 	. = ..()
@@ -248,28 +247,55 @@
 	if(mode == SHUTTLE_PREARRIVAL && !dropzone.landing_lights_on)
 		if(istype(destination, /obj/docking_port/stationary/marine_dropship))
 			dropzone.turn_on_landing_lights()
-		playsound(dropzone.return_center_turf(), landing_sound, 50, 0)
-		playsound(return_center_turf(), landing_sound, 50, 0, SOUND_CHANNEL_DROPSHIP)
+		playsound(dropzone.return_center_turf(), landing_sound, channel = SOUND_CHANNEL_DROPSHIP, vol_cat = VOLUME_SFX)
+		playsound(return_center_turf(), landing_sound, channel = SOUND_CHANNEL_DROPSHIP, vol_cat = VOLUME_SFX)
 
 	automated_check()
 
 	hijack?.check()
 
 /obj/docking_port/mobile/marine_dropship/proc/automated_check()
+	if(!automated_hangar || !automated_lz || !automated_delay)
+		return
+
 	var/obj/structure/machinery/computer/shuttle/dropship/flight/root_console = getControlConsole()
 	if(root_console.dropship_control_lost)
-		automated_hangar_id = null
-		automated_lz_id = null
+		automated_hangar = null
+		automated_lz = null
 		automated_delay = null
 		return
 
-	if(automated_hangar_id && automated_lz_id && automated_delay && !automated_timer && mode == SHUTTLE_IDLE)
+	if(flags_automated_airlock_presence)
+		var/is_lz_dock_ready = TRUE // if they aren't airlocks, this value won't be changed, so they are 'ready' for automated transport
+		var/is_hangar_dock_ready = TRUE
+		var/obj/docking_port/stationary/marine_dropship/airlock/outer/outer_airlock_dock
+		if(flags_automated_airlock_presence & DROPSHIP_HANGAR_DOCK_IS_AIRLOCK)
+			outer_airlock_dock = automated_hangar
+			if(outer_airlock_dock?.linked_inner?.processing)
+				return
+			if(outer_airlock_dock?.linked_inner?.test_conditions(test_outer = FALSE) && !istype(get_docked(), /obj/docking_port/stationary/marine_dropship/airlock/inner))
+				is_hangar_dock_ready = FALSE
+		if(flags_automated_airlock_presence & DROPSHIP_LZ_DOCK_IS_AIRLOCK)
+			outer_airlock_dock = automated_lz
+			if(outer_airlock_dock?.linked_inner?.processing)
+				return
+			if(outer_airlock_dock?.linked_inner?.test_conditions(test_outer = FALSE) && !istype(get_docked(), /obj/docking_port/stationary/marine_dropship/airlock/inner))
+				is_lz_dock_ready = FALSE
+		if(!is_lz_dock_ready || !is_hangar_dock_ready)
+			log_ares_flight("Automatic","Automatic dropship flight on [name] has been disabled due to a lack of response from a dropship airlock.")
+			ai_silent_announcement("Automatic dropship flight on [name] has been disabled due to a lack of response from a dropship airlock.")
+			automated_hangar = null
+			automated_lz = null
+			automated_delay = null
+			return
+
+	if(mode == SHUTTLE_IDLE && !automated_timer)
 		ai_silent_announcement("The [name] will automatically depart in [automated_delay * 0.1] seconds")
 		automated_timer = addtimer(CALLBACK(src, PROC_REF(automated_fly)), automated_delay, TIMER_STOPPABLE)
 
 /obj/docking_port/mobile/marine_dropship/proc/automated_fly()
 	automated_timer = null
-	if(!automated_hangar_id || !automated_lz_id || !automated_delay)
+	if(!automated_hangar || !automated_lz || !automated_delay)
 		return
 	var/obj/structure/machinery/computer/shuttle/dropship/flight/root_console = getControlConsole()
 	if(root_console.dropship_control_lost)
@@ -277,29 +303,50 @@
 	if(mode != SHUTTLE_IDLE)
 		return
 	var/obj/docking_port/stationary/dockedAt = get_docked()
-	if(dockedAt.id == automated_hangar_id)
-		SSshuttle.moveShuttle(id, automated_lz_id, TRUE)
-	else
-		SSshuttle.moveShuttle(id, automated_hangar_id, TRUE)
-	ai_silent_announcement("Dropship '[name]' departing.")
+	if(!automated_target)
+		if(dockedAt.id == automated_hangar.id)
+			automated_target = automated_lz.id
+		else if (dockedAt.id == automated_lz.id)
+			automated_target = automated_hangar.id
+	if(flags_automated_airlock_presence && istype(dockedAt, /obj/docking_port/stationary/marine_dropship/airlock))
+		var/list/return_list = null
+		var/obj/docking_port/stationary/marine_dropship/airlock/inner/dockedAt_airlock_inner
+		var/obj/docking_port/stationary/marine_dropship/airlock/outer/dockedAt_airlock_outer
+		if(istype(dockedAt, /obj/docking_port/stationary/marine_dropship/airlock/inner))
+			dockedAt_airlock_inner = dockedAt
+		if(istype(dockedAt, /obj/docking_port/stationary/marine_dropship/airlock/outer))
+			dockedAt_airlock_outer = dockedAt
+			dockedAt_airlock_inner = dockedAt_airlock_outer.linked_inner
+		if(dockedAt_airlock_inner.processing)
+			return
+		if(dockedAt_airlock_inner.linked_outer.id == automated_hangar.id)
+			automated_target = automated_lz.id
+		else if(dockedAt_airlock_inner.linked_outer.id == automated_lz.id)
+			automated_target = automated_hangar.id
+		if(!dockedAt_airlock_outer) // is the dockedAt inner
+			return_list = dockedAt_airlock_inner.automatic_process(DROPSHIP_AIRLOCK_GO_DOWN)
+		if(return_list)
+			if(!return_list["successful"])
+				log_ares_flight("Automatic","Automatic dropship flight on \the [name] has been disabled because [lowertext(return_list["to_chat"])]")
+				ai_silent_announcement("Automatic dropship flight on \the [name] has been disabled because [lowertext(return_list["to_chat"])]")
+				automated_hangar = null
+				automated_lz = null
+				automated_delay = null
+			return
+	if(automated_target)
+		SSshuttle.moveShuttle(id, automated_target, TRUE)
+		automated_target = null
+		ai_silent_announcement("Dropship '[name]' departing.")
 
 /obj/docking_port/mobile/marine_dropship/proc/dropship_freefall()
-	// this prevents atoms from being called more than once as the proc works it way through the turfs (some may be thrown onto a turf that hasn't been called yet)
-	var/list/affected_mobs = list()
-	var/list/affected_items = list()
-	for(var/area/internal_area in shuttle_areas)
-		for(var/turf/internal_turf in internal_area)
-			for(var/mob/living/M in internal_turf)
-				affected_mobs += M
-			for(var/obj/item/I in internal_turf)
-				affected_items += I
+	var/list/affected_list = turbulence_sort_affected()
 
-	for(var/mob/living/affected_mob in affected_mobs)
+	for(var/mob/living/affected_mob as anything in affected_list["mobs"])
 		to_chat(affected_mob, SPAN_DANGER("The dropship jolts violently as it enters freefall!"))
-		shake_camera(affected_mob, 6 SECONDS, 1)
-		shake_camera(affected_mob, 16 SECONDS, 1)
+		shake_camera(affected_mob, DROPSHIP_TURBULENCE_FREEFALL_PERIOD / 3, 1)
+		shake_camera(affected_mob, DROPSHIP_TURBULENCE_FREEFALL_PERIOD, 1)
 		if(!affected_mob.buckled)
-			affected_mob.KnockDown(16)
+			affected_mob.KnockDown(DROPSHIP_TURBULENCE_FREEFALL_PERIOD * 0.1)
 			affected_mob.throw_random_direction(2, spin = TRUE)
 			affected_mob.apply_armoured_damage(80, ARMOR_MELEE, BRUTE, rand_zone())
 			affected_mob.visible_message(SPAN_DANGER("[affected_mob] loses their grip on the floor, flying violenty upwards!"), SPAN_DANGER("You lose your grip on the floor, flying violenty upwards!"))
@@ -308,11 +355,7 @@
 				var/obj/limb/fracturing_limb = affected_human.get_limb(pick(ALL_LIMBS))
 				fracturing_limb.fracture(100)
 
-	for(var/obj/item/affected_item in affected_items)
-		affected_item.visible_message(SPAN_DANGER("[affected_item] goes flying upwards!"))
-		affected_item.throwforce *= DROPSHIP_TURBULENCE_THROWFORCE_MULTIPLIER
-		affected_item.throw_random_direction(2, spin = TRUE)
-		affected_item.throwforce /= DROPSHIP_TURBULENCE_THROWFORCE_MULTIPLIER
+	turbulence_item_handle(affected_list["items"])
 
 /obj/docking_port/mobile/marine_dropship/proc/turbulence()
 	if(!in_flight())
@@ -323,17 +366,9 @@
 	if(!prob(DROPSHIP_TURBULENCE_PROBABILITY))
 		return
 
-	// this prevents atoms from being called more than once as the proc works it way through the turfs (some may be thrown onto a turf that hasn't been called yet)
-	var/list/affected_mobs = list()
-	var/list/affected_items = list()
-	for(var/area/internal_area in shuttle_areas)
-		for(var/turf/internal_turf in internal_area)
-			for(var/mob/living/M in internal_turf)
-				affected_mobs += M
-			for(var/obj/item/I in internal_turf)
-				affected_items += I
+	var/list/affected_list = turbulence_sort_affected()
 
-	for(var/mob/living/affected_mob in affected_mobs)
+	for(var/mob/living/affected_mob as anything in affected_list["mobs"])
 		to_chat(affected_mob, SPAN_DANGER("The dropship jolts violently!"))
 		shake_camera(affected_mob, DROPSHIP_TURBULENCE_PERIOD, 1)
 		if(!affected_mob.buckled && affected_mob.m_intent == MOVE_INTENT_RUN && prob(DROPSHIP_TURBULENCE_GRIPLOSS_PROBABILITY))
@@ -345,11 +380,26 @@
 				var/obj/limb/fracturing_limb = affected_human.get_limb(pick(ALL_LIMBS))
 				fracturing_limb.fracture(100)
 
-	for(var/obj/item/affected_item in affected_items)
+	turbulence_item_handle(affected_list["items"])
+
+/obj/docking_port/mobile/marine_dropship/proc/turbulence_item_handle(affected_items) // the logic for turbulence and freefall, when handling items, is equivelant
+	for(var/obj/item/affected_item as anything in affected_items)
 		affected_item.visible_message(SPAN_DANGER("[affected_item] goes flying upwards!"))
 		affected_item.throwforce *= DROPSHIP_TURBULENCE_THROWFORCE_MULTIPLIER
 		affected_item.throw_random_direction(2, spin = TRUE)
 		affected_item.throwforce /= DROPSHIP_TURBULENCE_THROWFORCE_MULTIPLIER
+
+/obj/docking_port/mobile/marine_dropship/proc/turbulence_sort_affected()
+	// this prevents atoms from being called more than once as the proc works it way through the turfs (some may be thrown onto a turf that hasn't been called yet)
+	var/list/affected_mobs = list()
+	var/list/affected_items = list()
+	for(var/area/internal_area in shuttle_areas)
+		for(var/turf/internal_turf in internal_area)
+			for(var/mob/living/M in internal_turf)
+				affected_mobs += M
+			for(var/obj/item/I in internal_turf)
+				affected_items += I
+	return list("mobs" = affected_mobs, "items" = affected_items)
 
 /obj/docking_port/stationary/marine_dropship
 	dir = NORTH
