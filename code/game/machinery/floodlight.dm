@@ -92,39 +92,24 @@
 	. = ..()
 	icon_state = "floor_flood0[light_on]"
 
-/obj/structure/machinery/floodlight/landing/dropship_airlock
+/obj/structure/machinery/floodlight/landing/airlock
 
-	var/linked_inner_dropship_airlock_id = "generic"
-	var/obj/docking_port/stationary/marine_dropship/airlock/inner/linked_inner = null
-	var/toggled
+	var/hangar_dock_path = /obj/docking_port/stationary/marine_dropship/airlock/inner
 
-/obj/structure/machinery/floodlight/landing/dropship_airlock/Initialize(mapload, ...)
+/obj/structure/machinery/floodlight/landing/airlock/Initialize(mapload, ...)
 	. = ..()
-	QDEL_NULL(static_light)
-	light_system = MOVABLE_LIGHT
-	set_light(10, 2, LIGHT_COLOR_BLUE, /atom/movable/lighting_mask/rotating_toggleable)
-	return INITIALIZE_HINT_LATELOAD
+	var/obj/docking_port/stationary/marine_dropship/airlock/inner/hangar_dock = locate(hangar_dock_path)
+	if(hangar_dock)
+		hangar_dock.floodlights += src
 
-/obj/structure/machinery/floodlight/landing/dropship_airlock/LateInitialize()
-	. = ..()
-	for(var/obj/docking_port/stationary/marine_dropship/airlock/inner/inner_airlock in GLOB.dropship_airlock_docking_ports)
-		if(linked_inner_dropship_airlock_id == inner_airlock.dropship_airlock_id)
-			linked_inner = inner_airlock
-			linked_inner.floodlights += src
-
-/obj/structure/machinery/floodlight/landing/dropship_airlock/Destroy()
-	if(linked_inner)
-		linked_inner.floodlights -= src
+/obj/structure/machinery/floodlight/landing/airlock/Destroy()
+	var/obj/docking_port/stationary/marine_dropship/airlock/inner/hangar_dock = locate(hangar_dock_path)
+	if(hangar_dock)
+		hangar_dock.floodlights -= src
 	. = ..()
 
-/obj/structure/machinery/floodlight/landing/dropship_airlock/proc/toggle_rotating()
-	if(istype(light.our_mask, /atom/movable/lighting_mask/rotating_toggleable))
-		var/atom/movable/lighting_mask/rotating_toggleable/rotating_mask = light.our_mask
-		playsound(src, 'sound/machines/switch.ogg', 100, vol_cat = VOLUME_SFX)
-		rotating_mask.toggle()
+/obj/structure/machinery/floodlight/landing/airlock/golden_arrow_one
+	hangar_dock_path = /obj/docking_port/stationary/marine_dropship/airlock/inner/golden_arrow_one
 
-/obj/structure/machinery/floodlight/landing/dropship_airlock/golden_arrow_one
-	linked_inner_dropship_airlock_id = GOLDEN_ARROW_AIRLOCK_ONE
-
-/obj/structure/machinery/floodlight/landing/dropship_airlock/golden_arrow_two
-	linked_inner_dropship_airlock_id = GOLDEN_ARROW_AIRLOCK_TWO
+/obj/structure/machinery/floodlight/landing/airlock/golden_arrow_two
+	hangar_dock_path = /obj/docking_port/stationary/marine_dropship/airlock/inner/golden_arrow_two
