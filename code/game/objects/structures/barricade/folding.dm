@@ -262,12 +262,12 @@
 	update_icon()
 
 
-/obj/structure/barricade/plasteel/wired/New()
+/obj/structure/barricade/plasteel/wired/Initialize(mapload, mob/user)
+	. = ..()
 	can_wire = FALSE
 	is_wired = TRUE
 	climbable = FALSE
 	update_icon()
-	return ..()
 
 /obj/structure/barricade/plasteel/wired/initialize_pass_flags(datum/pass_flags_container/PF)
 	..()
@@ -290,12 +290,12 @@
 
 	linkable = FALSE
 
-/obj/structure/barricade/plasteel/metal/wired/New()
+/obj/structure/barricade/plasteel/metal/wired/Initialize(mapload, mob/user)
+	. = ..()
 	can_wire = FALSE
 	is_wired = TRUE
 	climbable = FALSE
 	update_icon()
-	return ..()
 
 /obj/structure/barricade/plasteel/metal/wired/initialize_pass_flags(datum/pass_flags_container/PF)
 	..()

@@ -1,7 +1,9 @@
-import { useBackend, useLocalState } from '../backend';
-import { Button, Section, Stack, Divider } from '../components';
-import { Window } from '../layouts';
 import { BooleanLike } from 'common/react';
+import { useState } from 'react';
+
+import { useBackend } from '../backend';
+import { Button, Divider, Section, Stack } from '../components';
+import { Window } from '../layouts';
 
 type Squad = {
   id: number;
@@ -39,14 +41,8 @@ type BackendContext = {
 
 const AIContext = (props, context) => {
   const { data, act } = useBackend<BackendContext>();
-  const [squadAssignmentMode, setSquadAssignmentMode] = useLocalState(
-    'squad_assignment_mode',
-    false,
-  );
-  const [orderAssignmentMode, setOrderAssignmentMode] = useLocalState(
-    'order_assignment_mode',
-    false,
-  );
+  const [squadAssignmentMode, setSquadAssignmentMode] = useState(false);
+  const [orderAssignmentMode, setOrderAssignmentMode] = useState(false);
   return (
     <Stack fill vertical>
       <div>
@@ -54,7 +50,7 @@ const AIContext = (props, context) => {
           style={{
             float: 'left',
             display: 'inline-block',
-            'padding-right': '6px',
+            paddingRight: '6px',
           }}
         >
           <Button content="New Squad" onClick={() => act('create_squad')} />
@@ -63,7 +59,7 @@ const AIContext = (props, context) => {
           style={{
             float: 'left',
             display: 'inline-block',
-            'padding-right': '6px',
+            paddingRight: '6px',
           }}
         >
           <Button
@@ -79,7 +75,7 @@ const AIContext = (props, context) => {
           style={{
             float: 'left',
             display: 'inline-block',
-            'padding-right': '6px',
+            paddingRight: '6px',
           }}
         >
           <Button
@@ -95,19 +91,19 @@ const AIContext = (props, context) => {
       <Divider />
       <div>
         {data.orders.map((order) => (
-          <CreatedOrder order={order} id={order.ref} />
+          <CreatedOrder order={order} key={order.ref} />
         ))}
       </div>
       <Divider />
       <div>
         {data.ai_humans.map((human) => (
-          <HumanAIReadout human={human} id={human.ref} />
+          <HumanAIReadout human={human} key={human.ref} />
         ))}
       </div>
       <Divider />
       <div>
         {data.squads.map((squad) => (
-          <SquadReadout squad={squad} id={squad.ref} />
+          <SquadReadout squad={squad} key={squad.ref} />
         ))}
       </div>
     </Stack>
@@ -118,17 +114,14 @@ const CreatedOrder = (props) => {
   const order: Order = props.order;
   const context: BackendContext = props.context;
   const { data, act } = useBackend<BackendContext>();
-  const [orderAssignmentMode, setOrderAssignmentMode] = useLocalState(
-    'order_assignment_mode',
-    false,
-  );
-  const [selectedSquad, setSelectedSquad] = useLocalState('selected_squad', -1);
+  const [orderAssignmentMode, setOrderAssignmentMode] = useState(false);
+  const [selectedSquad, setSelectedSquad] = useState(-1);
   return (
     <div
       style={{
         float: 'left',
         display: 'inline-block',
-        'padding-right': '6px',
+        paddingRight: '6px',
       }}
     >
       <Section title={`${order.name}`}>
@@ -188,7 +181,7 @@ const CreatedOrder = (props) => {
           </>
         )}
         {order.data[0].map((data_name, i) => (
-          <div>
+          <div key={data_name}>
             {data_name}: {order.data[1][i]}
           </div>
         ))}
@@ -200,11 +193,8 @@ const CreatedOrder = (props) => {
 const HumanAIReadout = (props) => {
   const human: AIHuman = props.human;
   const context: BackendContext = props.context;
-  const [squadAssignmentMode, setSquadAssignmentMode] = useLocalState(
-    'squad_assignment_mode',
-    false,
-  );
-  const [selectedSquad, setSelectedSquad] = useLocalState('selected_squad', -1);
+  const [squadAssignmentMode, setSquadAssignmentMode] = useState(false);
+  const [selectedSquad, setSelectedSquad] = useState(-1);
   const { data, act } = useBackend<BackendContext>();
   const gottenSquad: Squad = data.squads[selectedSquad];
   return (
@@ -212,7 +202,7 @@ const HumanAIReadout = (props) => {
       style={{
         float: 'left',
         display: 'inline-block',
-        'padding-right': '6px',
+        paddingRight: '6px',
       }}
     >
       <Section title={`${human.name}`}>
@@ -231,7 +221,7 @@ const HumanAIReadout = (props) => {
                 color="green"
                 disabled={
                   selectedSquad === -1 ||
-                  human.squad_id == selectedSquad ||
+                  human.squad_id === selectedSquad ||
                   !human.can_assign_squad
                 }
                 style={{
@@ -249,7 +239,7 @@ const HumanAIReadout = (props) => {
                 }
                 color={
                   gottenSquad !== undefined &&
-                  gottenSquad.squad_leader == human.name
+                  gottenSquad.squad_leader === human.name
                     ? 'green'
                     : 'red'
                 }
@@ -327,21 +317,15 @@ const SquadReadout = (props) => {
   const squad: Squad = props.squad;
   const context: BackendContext = props.context;
   const { data, act } = useBackend<BackendContext>();
-  const [squadAssignmentMode, setSquadAssignmentMode] = useLocalState(
-    'squad_assignment_mode',
-    false,
-  );
-  const [selectedSquad, setSelectedSquad] = useLocalState('selected_squad', -1);
-  const [orderAssignmentMode, setOrderAssignmentMode] = useLocalState(
-    'order_assignment_mode',
-    false,
-  );
+  const [squadAssignmentMode, setSquadAssignmentMode] = useState(false);
+  const [selectedSquad, setSelectedSquad] = useState(-1);
+  const [orderAssignmentMode, setOrderAssignmentMode] = useState(false);
   return (
     <div
       style={{
         float: 'left',
         display: 'inline-block',
-        'padding-right': '6px',
+        paddingRight: '6px',
       }}
     >
       <Section title={`${squad.id}`}>

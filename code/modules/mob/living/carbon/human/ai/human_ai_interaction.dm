@@ -155,7 +155,7 @@
 		return TRUE
 
 	if(brain.faction_check(src))
-		var/random_intent = pick(INTENT_DISARM, INTENT_HARM, INTENT_HELP)
+		var/random_intent = pick(INTENT_DISARM, INTENT_HARM, INTENT_HELP, INTENT_DISARM, INTENT_HARM) // lower chance of help intent
 		ai_human.a_intent = random_intent
 		if(get_ai_brain())
 			a_intent = random_intent
@@ -202,16 +202,6 @@
 		return
 
 	return SENTRY_PENALTY
-
-
-/////////////////////////////
-//      WINDOW FRAME       //
-/////////////////////////////
-/*obj/structure/window_frame/human_ai_obstacle(mob/living/carbon/human/ai_human, datum/human_ai_brain/brain, direction, turf/target)
-	if(buildstacktype && brain.get_tool_from_equipment_map(TRAIT_TOOL_WRENCH))
-		return ..()
-	return WINDOW_FRAME_PENALTY*/
-
 
 /////////////////////////////
 //       BARRICADES        //

@@ -154,10 +154,14 @@
 	human_ai_menu.tgui_interact(mob)
 
 /client/proc/create_human_ai()
-	set name = "Create Human AI"
+	set name = "Create Human AI - Expanded"
 	set category = "Game Master.HumanAI"
 
 	if(!check_rights(R_DEBUG))
+		return
+
+	if(!SSticker.mode)
+		to_chat(src, SPAN_WARNING("The round hasn't started yet!"))
 		return
 
 	var/mob/living/carbon/human/ai_human = new()
@@ -180,13 +184,13 @@
 		return
 
 	if(QDELETED(mob))
-		return //mob is garbage collected
+		return
 
 	if(mob.GetComponent(/datum/component/human_ai))
 		to_chat(usr, SPAN_WARNING("[mob] already has an assigned AI."))
 		return
 
-	if(mob.ckey && alert("This mob is being controlled by [mob.ckey]. Are you sure you wish to add AI to it?","Make AI","Yes","No") != "Yes")
+	if(mob.ckey && tgui_alert(mob, "This mob is being controlled by [mob.ckey]. Are you sure you wish to add AI to it?","Make AI", list("Yes","No")) != "Yes")
 		return
 
 	mob.AddComponent(/datum/component/human_ai)
@@ -196,7 +200,7 @@
 
 /client/proc/toggle_human_ai_tweaks()
 	set name = "Toggle Human AI Tweaks"
-	set category = "Game Master.HumanAI"
+	set category = "Game Master.Flags"
 
 	if(!admin_holder || !check_rights(R_MOD, FALSE))
 		return

@@ -1,14 +1,15 @@
 import { BooleanLike, classes } from 'common/react';
 import { useState } from 'react';
+
 import { useBackend } from '../backend';
 import {
   Box,
   Button,
+  Collapsible,
   Divider,
+  Dropdown,
   Section,
   Stack,
-  Dropdown,
-  Collapsible,
 } from '../components';
 import { Window } from '../layouts';
 
@@ -41,7 +42,7 @@ export const HumanDefenseManager = (props) => {
             <Stack.Item grow mr={1}>
               <Section fill height="100%">
                 {Object.keys(defenses).map((dictKey) => (
-                  <Collapsible title={dictKey} color="good">
+                  <Collapsible title={dictKey} key={dictKey} color="good">
                     {defenses[dictKey].map((defense) => (
                       <div style={{ paddingBottom: '12px' }} key={defense.path}>
                         <Button
@@ -63,7 +64,7 @@ export const HumanDefenseManager = (props) => {
             <Divider vertical />
             <Stack.Item width="30%">
               <Section title="Selected Defense">
-                {chosenDefense !== null ? (
+                {chosenDefense !== null && (
                   <Stack vertical>
                     <Stack.Item>
                       <div
@@ -153,8 +154,6 @@ export const HumanDefenseManager = (props) => {
                       </Button>
                     </Stack.Item>
                   </Stack>
-                ) : (
-                  <div />
                 )}
               </Section>
             </Stack.Item>

@@ -1,12 +1,14 @@
 GLOBAL_LIST_EMPTY(human_ai_brains)
 
 /datum/human_ai_brain
+	/// The human that this brain ties into
 	var/mob/living/carbon/human/tied_human
 
 	var/micro_action_delay = 0.2 SECONDS
 	var/short_action_delay = 0.5 SECONDS
 	var/medium_action_delay = 2 SECONDS
 	var/long_action_delay = 5 SECONDS
+	/// Global multiplier for all AI action delays
 	var/action_delay_mult = 1
 
 	/// If TRUE, shoots until the target is dead. Else, stops when downed
@@ -28,29 +30,42 @@ GLOBAL_LIST_EMPTY(human_ai_brains)
 	/// Semi-permanent "order" datum. Does not expire
 	var/datum/ai_order/current_order
 
+	/// A targeted turf that we should quickly approach
 	var/turf/quick_approach
 
+	/// Nearby turfs that we're watching for bullets
 	var/list/detection_turfs = list()
 
+	/// If TRUE, then we're actively fighting someone or saw a bullet go by or saw someone else go into combat
 	var/in_combat = FALSE
+
+	/// The minimum amount of time that can pass before this AI can leave combat
 	var/combat_decay_time_min = 15 SECONDS
+	/// The maximum amount of time that can pass before this AI can leave combat
 	var/combat_decay_time_max = 30 SECONDS
 
+	/// If this AI can seek cover while not possessing a gun
 	var/cover_without_gun = FALSE
 
+	/// The chance that the AI will leave cover when exiting combat
 	var/peek_cover_chance = 60
 
+	/// Factions that the AI won't engage in hostilities with. Controlled by the AI's faction
 	var/list/friendly_factions = list()
+	/// Factions that the AI will not become hostile to unless attacked
 	var/list/neutral_factions = list()
+
+	/// The last faction that the AI was/is a part of
 	var/previous_faction
 
-	var/squad_covering = FALSE
-
-	/// If false, cannot be assigned to a squad
+	/// If FALSE, cannot be assigned to a squad
 	var/can_assign_squad = TRUE
 
 	/// Ref to the latest weapon we've drawn as a melee
 	var/obj/item/drawn_melee_weapon
+
+	/// If TRUE, the AI will not move at all
+	var/hold_position = FALSE
 
 /datum/human_ai_brain/New(mob/living/carbon/human/tied_human)
 	. = ..()
@@ -65,6 +80,7 @@ GLOBAL_LIST_EMPTY(human_ai_brains)
 	RegisterSignal(tied_human, COMSIG_HUMAN_BULLET_ACT, PROC_REF(on_shot))
 	RegisterSignal(tied_human, COMSIG_HUMAN_HANDCUFFED, PROC_REF(on_handcuffed))
 	RegisterSignal(tied_human, COMSIG_HUMAN_GET_AI_BRAIN, PROC_REF(get_ai_brain))
+	RegisterSignal(tied_human, COMSIG_HUMAN_SET_SPECIES, PROC_REF(on_species_change))
 	GLOB.human_ai_brains += src
 	setup_detection_radius()
 	appraise_inventory()
@@ -82,10 +98,11 @@ GLOBAL_LIST_EMPTY(human_ai_brains)
 	end_cover()
 
 	in_combat = FALSE
-
 	target_turf = null
 	shot_at = null
 	drawn_melee_weapon = null
+	primary_weapon = null
+	gun_data = null
 	lose_target()
 
 	for(var/action in ongoing_actions)
@@ -109,7 +126,7 @@ GLOBAL_LIST_EMPTY(human_ai_brains)
 	if(tied_human.buckled)
 		tied_human.set_buckled(FALSE) // AI never buckle themselves into chairs at the moment, change if this becomes the case
 
-	if(treat_allies && !found_injured_ally)
+	if(treat_allies && !found_injured_ally && SShuman_ai.combat_ever_started)
 		set_injured_ally(get_injured_ally())
 
 	if(!current_target)
@@ -151,7 +168,7 @@ GLOBAL_LIST_EMPTY(human_ai_brains)
 			continue
 
 		ongoing_actions += new action_type(src)
-#ifdef TESTING
+#if defined(TESTING) && defined(HUMAN_AI_TESTING)
 		message_admins("action of type [action_type] was added to [tied_human.real_name]")
 #endif
 
@@ -205,6 +222,13 @@ GLOBAL_LIST_EMPTY(human_ai_brains)
 /datum/human_ai_brain/proc/on_human_delete(datum/source, force)
 	SIGNAL_HANDLER
 	tied_human = null
+
+/datum/human_ai_brain/proc/on_species_change(datum/source, new_species)
+	SIGNAL_HANDLER
+	if((new_species == SPECIES_YAUTJA) || (new_species == SPECIES_ZOMBIE))
+		ignore_looting = TRUE
+	else
+		ignore_looting = FALSE
 
 /datum/human_ai_brain/proc/setup_detection_radius()
 	if(length(detection_turfs))
@@ -286,6 +310,7 @@ GLOBAL_LIST_EMPTY(human_ai_brains)
 
 	in_combat = TRUE
 	addtimer(CALLBACK(src, PROC_REF(exit_combat)), rand(combat_decay_time_min, combat_decay_time_max), TIMER_UNIQUE | TIMER_NO_HASH_WAIT | TIMER_OVERRIDE)
+	SShuman_ai.combat_ever_started = TRUE
 
 /datum/human_ai_brain/proc/exit_combat()
 	if(tied_human.client)
@@ -334,7 +359,7 @@ GLOBAL_LIST_EMPTY(human_ai_brains)
 		set_target(bullet.firer)
 	else
 		COOLDOWN_START(src, fire_offscreen, 4 SECONDS)
-		target_turf = get_turf(bullet.firer	)
+		target_turf = get_turf(bullet.firer)
 
 	if(!current_cover)
 		try_cover(bullet.angle, bullet.firer)

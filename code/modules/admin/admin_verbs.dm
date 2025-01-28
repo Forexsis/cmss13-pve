@@ -84,9 +84,11 @@ GLOBAL_LIST_INIT(admin_verbs_default, list(
 	/client/proc/make_human_ai,
 	/datum/admins/proc/create_human_ai_sniper,
 	/client/proc/quick_order_ai_approach,
+	/client/proc/quick_order_ai_hold_position,
 	/client/proc/place_plastic_explosives,
 	/client/proc/toggle_human_ai_tweaks,
 	/client/proc/open_human_squad_spawner_panel,
+	/client/proc/open_human_ai_spawner_panel,
 	))
 
 
@@ -310,7 +312,8 @@ GLOBAL_LIST_INIT(admin_verbs_hideable, list(
 	/client/proc/cmd_admin_delete,
 	/datum/admins/proc/togglesleep,
 	/client/proc/debug_variables,
-	/client/proc/debug_global_variables
+	/client/proc/debug_global_variables,
+	/client/proc/make_human_ai,
 ))
 
 GLOBAL_LIST_INIT(admin_verbs_teleport, list(
@@ -393,6 +396,7 @@ GLOBAL_LIST_INIT(roundstart_mod_verbs, list(
 		/client/proc/toggle_ai_xeno_weeding,
 		/client/proc/toggle_rappel_menu,
 		/client/proc/toggle_fire_support_menu,
+		/client/proc/admin_marine_announcement,
 		GLOB.admin_verbs_admin,
 		GLOB.admin_verbs_ban,
 		GLOB.admin_verbs_minor_event,

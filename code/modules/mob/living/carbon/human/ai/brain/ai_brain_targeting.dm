@@ -16,6 +16,7 @@
 
 	COOLDOWN_DECLARE(fire_offscreen)
 
+/// Locates a viable target within vision
 /datum/human_ai_brain/proc/get_target()
 	var/list/viable_targets = list()
 	var/atom/movable/closest_target
@@ -25,23 +26,24 @@
 	var/list/dir_cone = reverse_nearby_direction(reverse_direction(tied_human.dir))
 	var/rear_view_penalty = scope_vision ? view_distance / 7 - 1 : 0
 
-	for(var/mob/living/carbon/potential_target as anything in GLOB.alive_mob_list)
-		if(!istype(potential_target))
+	var/list/view_list = list()
+	for(var/mob/living/viewing_mob in view(view_distance, tied_human))
+		if(viewing_mob == tied_human)
 			continue
 
-		if(tied_human.z != potential_target.z)
-			continue
+		if(!has_nightvision && (get_dist(viewing_mob, tied_human) > 1))
+			for(var/turf/open/nearby_turf in range(1, viewing_mob))
+				if(nearby_turf.luminosity || (nearby_turf.dynamic_lumcount >= 1))
+					view_list += viewing_mob
+					break
+		else
+			view_list += viewing_mob
 
+	for(var/mob/living/carbon/potential_target as anything in view_list)
 		if(!can_target(potential_target))
 			continue
 
-		if(!(tied_human in viewers(view_distance, potential_target)))
-			continue
-
 		var/distance = get_dist(tied_human, potential_target)
-		if(distance > view_distance)
-			continue
-
 		if(scope_vision && (distance > 7) && !(get_dir(tied_human, potential_target) in dir_cone))
 			continue
 
@@ -147,16 +149,15 @@
 
 	return TRUE
 
+/// Given a target, checks if there are any (not laying down) friendlies in a line between the AI and the target
 /datum/human_ai_brain/proc/friendly_check(atom/target)
 	var/list/turf_list = get_line(get_turf(tied_human), get_turf(target))
+	turf_list.Cut(1, 2) // starting turf
 	for(var/turf/tile in turf_list)
 		if(istype(tile, /turf/closed))
 			return TRUE
 
 		for(var/mob/living/carbon/human/possible_friendly in tile)
-			if(tied_human == possible_friendly)
-				continue
-
 			if(possible_friendly.body_position == LYING_DOWN)
 				continue
 

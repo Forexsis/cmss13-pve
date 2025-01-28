@@ -22,6 +22,9 @@ SUBSYSTEM_DEF(human_ai)
 
 	var/list/human_ai_factions = list()
 
+	/// If TRUE, then combat has been initiated at some point ever. Used for optimization reasons
+	var/combat_ever_started = FALSE
+
 /datum/controller/subsystem/human_ai/Initialize()
 	for(var/faction_path in subtypesof(/datum/human_ai_faction))
 		var/datum/human_ai_faction/faction_obj = new faction_path
@@ -34,7 +37,7 @@ SUBSYSTEM_DEF(human_ai)
 
 /datum/admins/proc/toggle_human_ai()
 	set name = "Toggle Human AI"
-	set category = "Game Master.HumanAI"
+	set category = "Game Master.Flags"
 
 	if(!check_rights(R_DEBUG))
 		return
