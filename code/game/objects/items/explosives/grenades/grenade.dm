@@ -29,7 +29,6 @@
 	ground_offset_y = 6
 	var/dual_purpose = FALSE
 	var/fuse_type = TIMED_FUSE
-	var/spent_case = null //For smokes & such that leave behind used up cases/shells
 
 
 /obj/item/explosive/grenade/Initialize()

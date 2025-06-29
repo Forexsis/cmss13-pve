@@ -331,14 +331,6 @@
 /turf/closed/shuttle/twe_dropship/transparent
 	opacity = FALSE
 
-/turf/closed/shuttle/gibraltar
-	name = "\improper Gibraltar"
-	icon = 'icons/turf/dropship_rmc.dmi'
-	icon_state = "1"
-
-/turf/closed/shuttle/gibraltar/transparent
-	opacity = FALSE
-
 /turf/closed/shuttle/dropship3
 	name = "\improper Saipan"
 	icon = 'icons/turf/dropship3.dmi'

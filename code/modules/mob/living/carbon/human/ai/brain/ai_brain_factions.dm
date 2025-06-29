@@ -1382,7 +1382,6 @@
 	friendly_factions = list(
 		FACTION_COLONIST,
 		FACTION_WY,
-		FACTION_PMC,
 	)
 	neutral_factions = list(
 		FACTION_FREELANCER,
