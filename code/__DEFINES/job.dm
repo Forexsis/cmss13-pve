@@ -209,6 +209,7 @@ GLOBAL_LIST_INIT(job_command_roles, JOB_COMMAND_ROLES_LIST)
 #define JOB_ARMY_MT "Army Technical Engineer"
 #define JOB_ARMY_CT "Army Logistics Specialist"
 #define JOB_ARMY_MEDIC "Army Combat Medical Technician"
+#define JOB_ARMY_TANK_CREW "Army Vehicle Crewman"
 #define JOB_ARMY_NCO "Army Fireteam Lead"
 #define JOB_ARMY_SNCO "Army Squad Leader"
 #define JOB_ARMY_LT "Army Lieutenant"
@@ -419,6 +420,18 @@ GLOBAL_LIST_INIT(job_command_roles, JOB_COMMAND_ROLES_LIST)
 //-------- UAAC --------//
 #define JOB_TIS_IO "UAAC-TIS Intelligence Officer"
 #define JOB_TIS_SA "UAAC-TIS Special Agent"
+
+//-------- BD MERCS --------//
+#define JOB_MERCENARY "BD Grunt"
+#define JOB_MERCENARY_PILOT "BD Pilot"
+#define JOB_MERCENARY_SENTINEL "BD Sentinel"
+#define JOB_MERCENARY_SUPERVISOR "BD Supervisor"
+#define JOB_MERCENARY_BULWARK "BD Bulwark"
+#define JOB_MERCENARY_SYNTH "BD Synth"
+#define JOB_MERCENARY_INFILTRATOR "BD Infiltrator"
+#define JOB_MERCENARY_OFFICER "BD Officer"
+
+#define BD_MERCS_JOB_LIST list(JOB_MERCENARY_GRUNT, JOB_MERCENARY_PILOT, JOB_MERCENARY_SENTINEL, JOB_MERCENARY_SUPERVISOR, JOB_MERCENARY_BULWARK, JOB_MERCENARY_SYNTH, JOB_MERCENARY_INFILTRATOR, JOB_MERCENARY_OFFICER)
 
 #define TIS_JOB_LIST list(JOB_TIS_SA, JOB_TIS_IO)
 //-------- DUTCH'S DOZEN --------//
